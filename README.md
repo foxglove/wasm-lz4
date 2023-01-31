@@ -1,4 +1,4 @@
-# wasm-lz4
+# @foxglove/wasm-lz4
 
 https://github.com/lz4/lz4 compiled to WebAssembly. For now only decompression is supported. PRs welcome!
 
@@ -7,16 +7,16 @@ https://github.com/lz4/lz4 compiled to WebAssembly. For now only decompression i
 `wasm-lz4` exports a single function:
 
 ```js
-export default (buffer: Buffer, destinationByteSize: number) => Buffer
+export default (buffer: Buffer, destinationByteSize: number) => Buffer;
 ```
 
 Here is an example of using the module:
 
 ```js
-import fs from 'fs'
-import decompress from 'wasm-lz4';
+import fs from "fs";
+import decompress from "wasm-lz4";
 
-const compressedBytes = fs.readFileSync('compressed.lz4');
+const compressedBytes = fs.readFileSync("compressed.lz4");
 
 // currently you need to know the exact expected size of the output buffer
 // so the wasm runtime can allocate enough bytes to decompress into
@@ -27,7 +27,7 @@ const decompressedBytes = decompress(compressedBytes, outputBytes);
 
 ## Using the module in a browser
 
-Emscripten compiled WebAssembly modules are built in 2 parts: a `.js` side and a `.wasm` side.  In the browser the `.js` side needs to download the `.wasm` side from the server so it can compile it.  There is [more information available in the emscripten documentation](https://kripken.github.io/emscripten-site/docs/compiling/Deploying-Pages.html).
+Emscripten compiled WebAssembly modules are built in 2 parts: a `.js` side and a `.wasm` side. In the browser the `.js` side needs to download the `.wasm` side from the server so it can compile it. There is [more information available in the emscripten documentation](https://kripken.github.io/emscripten-site/docs/compiling/Deploying-Pages.html).
 
 ### Usage with Webpack
 
@@ -50,13 +50,13 @@ rules : [
   ...
 ]
 ...
- ```
+```
 
 The `javascript/auto` type setting tells Webpack to bypass its default importing logic, and just import the file as-is. Hopefully this hack will go away with improved WebAssembly support in webpack.
 
 ## Asynchronous loading & compiling
 
-After the `.wasm` binary is loaded (via `fetch` in the browser or `require` in node) it must be compiled by the WebAssembly runtime.  If you call `decompress` before it is finished compiling it will throw an error indicating it isn't ready yet.  To wait for the module to be loaded you can do something like the following:
+After the `.wasm` binary is loaded (via `fetch` in the browser or `require` in node) it must be compiled by the WebAssembly runtime. If you call `decompress` before it is finished compiling it will throw an error indicating it isn't ready yet. To wait for the module to be loaded you can do something like the following:
 
 ```
 import decompress from 'wasm-lz4'
