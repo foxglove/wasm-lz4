@@ -2,12 +2,14 @@
   "name": "@foxglove/wasm-lz4",
   "version": "0.1.0",
   "main": "dist/index.js",
+  "types": "index.d.ts",
   "license": "MIT",
   "repository": "cruise-automation/wasm-lz4",
   "files": [
     "dist/index.js",
     "dist/wasm-lz4.js",
-    "dist/wasm-lz4.wasm"
+    "dist/wasm-lz4.wasm",
+    "index.d.ts"
   ],
   "scripts": {
     "build": "./docker-build.sh",

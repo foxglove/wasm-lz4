@@ -72,3 +72,17 @@ async function doWork() {
 1. Run `npm install` to install dependencies.
 2. Run `npm run build` to invoke emcc inside a Docker container and compile the code in `wasm-lz4.c` as well as the required lz4 source files. The output will be in `dist/` on the host machine.
 3. Run `npm test` to run the tests.
+
+## License
+
+@foxglove/wasm-lz4 is licensed under [MIT License](https://opensource.org/licenses/MIT).
+
+## Releasing
+
+1. Run `yarn version --[major|minor|patch]` to bump version
+2. Run `git push && git push --tags` to push new tag
+3. GitHub Actions will take care of the rest
+
+## Stay in touch
+
+Join our [Slack channel](https://foxglove.dev/join-slack) to ask questions, share feedback, and stay up to date on what our team is working on.
