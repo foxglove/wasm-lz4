@@ -24,5 +24,6 @@
   },
   "prettier": {
     "printWidth": 120
-  }
+  },
+  "packageManager": "yarn@4.12.0"
 }
