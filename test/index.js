@@ -83,4 +83,12 @@ describe("wasm-lz4", () => {
       const result = decompress(Buffer.alloc(10, 1), 100);
     });
   });
+
+  it("decompresses after a failed decompression", () => {
+    assert.throws(() => {
+      decompress(compressed, uncompressed.byteLength - 100);
+    });
+    const result = decompress(compressed, uncompressed.byteLength);
+    assert(Buffer.compare(result, uncompressed) === 0);
+  });
 });
