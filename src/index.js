@@ -13,7 +13,7 @@ let context;
 function ensureLoaded() {
   if (!Module) {
     throw new Error(
-      `wasm-lz4 has not finished loading. Please wait with "await decompress.isLoaded" before calling decompress`
+      `wasm-lz4 has not finished loading. Please wait with "await decompress.isLoaded" before calling any methods`
     );
   }
 }
@@ -39,6 +39,45 @@ module.exports = function decompress(src, destSize) {
   try {
     if (resultSize === -1) {
       throw new Error("Error during decompression");
+    }
+
+    // copy destination buffer out of the heap back into js land
+    const output = Buffer.allocUnsafe(resultSize);
+    Buffer.from(Module.HEAPU8.buffer).copy(output, 0, destPointer, destPointer + resultSize);
+    return output;
+  } finally {
+    // free the source buffer memory
+    Module._free(srcPointer);
+    // free destination buffer on the heap
+    Module._free(destPointer);
+  }
+};
+
+// compresses src into a single lz4 frame
+// compressionLevel: negative values trade ratio for speed, 0 (the default) is
+// fast mode, and 3 through 12 use the slower high-compression mode
+module.exports.compress = function compress(src, compressionLevel) {
+  ensureLoaded();
+  if (compressionLevel == undefined) {
+    compressionLevel = 0;
+  }
+  const srcSize = src.byteLength;
+  const destSize = Module._compressFrameBound(srcSize, compressionLevel);
+
+  const srcPointer = Module._malloc(srcSize);
+  const destPointer = Module._malloc(destSize);
+
+  // create a view into the heap for our source buffer
+  const uncompressedHeap = new Uint8Array(Module.HEAPU8.buffer, srcPointer, srcSize);
+  // copy source buffer into the heap
+  uncompressedHeap.set(src);
+
+  // call the C function to compress the frame
+  const resultSize = Module._compressFrame(destPointer, destSize, srcPointer, srcSize, compressionLevel);
+
+  try {
+    if (resultSize === -1) {
+      throw new Error("Error during compression");
     }
 
     // copy destination buffer out of the heap back into js land
