@@ -17,9 +17,7 @@
     "test": "mocha"
   },
   "devDependencies": {
-    "eslint": "8.28.0",
-    "mocha": "10.1.0",
-    "prettier": "2.8.0",
+    "mocha": "10.8.2",
     "rosbag": "3.0.1"
   },
   "prettier": {
