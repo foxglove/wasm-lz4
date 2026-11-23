@@ -14,10 +14,9 @@
   "scripts": {
     "build": "./docker-build.sh",
     "prepack": "npm run build",
-    "test": "mocha"
+    "test": "node --test test/index.js"
   },
   "devDependencies": {
-    "mocha": "10.8.2",
     "rosbag": "3.0.1"
   },
   "prettier": {
