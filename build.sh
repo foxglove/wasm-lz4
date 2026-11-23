@@ -6,7 +6,7 @@ emcc \
   vendor/lz4/lib/xxhash.c \
   vendor/lz4/lib/lz4frame.c \
   -o dist/wasm-lz4.js src/wasm-lz4.c `# this runs emscripten on the code in wasm-lz4.c` \
-  -O3 `# compile with all optimizations enabled` \
+  -Os `# optimize for speed, without the transforms that grow the code` \
   -s WASM=1 `# compile to .wasm instead of asm.js` \
   --pre-js pre.js `# include pre.js at the top of wasm-lz4.js` \
   -s MODULARIZE=1 `# include module boilerplate for better node/webpack interop` \
