@@ -2,6 +2,7 @@
 
 emcc \
   vendor/lz4/lib/lz4.c \
+  vendor/lz4/lib/lz4hc.c \
   vendor/lz4/lib/xxhash.c \
   vendor/lz4/lib/lz4frame.c \
   -o dist/wasm-lz4.js src/wasm-lz4.c `# this runs emscripten on the code in wasm-lz4.c` \

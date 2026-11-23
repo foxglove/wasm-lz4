@@ -20,6 +20,9 @@ const uncompressed = fs.readFileSync(`${__dirname}/uncompressed.txt`);
 assert.throws(() => {
   decompress(compressed, uncompressed.byteLength);
 });
+assert.throws(() => {
+  decompress.compress(uncompressed);
+});
 
 describe("wasm-lz4", () => {
   it("waits until module is ready", done => {
@@ -91,5 +94,41 @@ describe("wasm-lz4", () => {
     });
     const result = decompress(compressed, uncompressed.byteLength);
     assert(Buffer.compare(result, uncompressed) === 0);
+  });
+
+  it("compresses frames that decompress to the original", () => {
+    for (const level of [undefined, -1, 0, 3, 12]) {
+      const frame = decompress.compress(uncompressed, level);
+      assert(frame.byteLength < uncompressed.byteLength);
+      // lz4 frame magic number
+      assert(frame.readUInt32LE(0) === 0x184d2204);
+      const result = decompress(frame, uncompressed.byteLength);
+      assert(Buffer.compare(result, uncompressed) === 0);
+    }
+  });
+
+  it("compresses more at high compression levels", () => {
+    const fast = decompress.compress(uncompressed, 0);
+    const slow = decompress.compress(uncompressed, 12);
+    assert(slow.byteLength < fast.byteLength);
+  });
+
+  it("compresses incompressible and empty input", () => {
+    const random = require("crypto").randomBytes(100000);
+    const randomFrame = decompress.compress(random);
+    assert(Buffer.compare(decompress(randomFrame, random.byteLength), random) === 0);
+
+    const emptyFrame = decompress.compress(Buffer.alloc(0));
+    assert(decompress(emptyFrame, 0).byteLength === 0);
+  });
+
+  it("does not grow the heap after multiple compression calls", () => {
+    decompress.compress(uncompressed);
+    const originalHeapSize = decompress.__module.HEAP8.buffer.byteLength;
+    for (var i = 0; i < 1000; i++) {
+      decompress.compress(uncompressed);
+    }
+    const newHeapSize = decompress.__module.HEAP8.buffer.byteLength;
+    assert(originalHeapSize === newHeapSize);
   });
 });

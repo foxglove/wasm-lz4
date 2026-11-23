@@ -1,16 +1,17 @@
 # @foxglove/wasm-lz4
 
-https://github.com/lz4/lz4 compiled to WebAssembly. For now only decompression is supported. PRs welcome!
+https://github.com/lz4/lz4 compiled to WebAssembly. Both directions use the [LZ4 frame format](https://github.com/lz4/lz4/blob/dev/doc/lz4_Frame_format.md).
 
 ## API
 
-`wasm-lz4` exports a single function:
+`wasm-lz4` exports a decompression function, with a compression function attached to it:
 
 ```js
-export default (buffer: Buffer, destinationByteSize: number) => Buffer;
+export default (buffer: Uint8Array, destinationByteSize: number) => Buffer;
+export default.compress = (buffer: Uint8Array, compressionLevel?: number) => Buffer;
 ```
 
-Here is an example of using the module:
+Here is an example of decompressing:
 
 ```js
 import fs from "fs";
@@ -23,6 +24,17 @@ const compressedBytes = fs.readFileSync("compressed.lz4");
 // TODO: this should not be necessary...it's exposed in the lz4 C code
 const outputBytes = compressedBytes * 10;
 const decompressedBytes = decompress(compressedBytes, outputBytes);
+```
+
+And an example of compressing:
+
+```js
+import decompress from "wasm-lz4";
+
+await decompress.isLoaded;
+// Negative levels trade ratio for speed, 0 (the default) is fast mode, and 3 through 12 use the
+// slower high-compression mode.
+const compressedBytes = decompress.compress(uncompressedBytes, 0);
 ```
 
 ## Using the module in a browser
@@ -56,7 +68,7 @@ The `javascript/auto` type setting tells Webpack to bypass its default importing
 
 ## Asynchronous loading & compiling
 
-After the `.wasm` binary is loaded (via `fetch` in the browser or `require` in node) it must be compiled by the WebAssembly runtime. If you call `decompress` before it is finished compiling it will throw an error indicating it isn't ready yet. To wait for the module to be loaded you can do something like the following:
+After the `.wasm` binary is loaded (via `fetch` in the browser or `require` in node) it must be compiled by the WebAssembly runtime. If you call `decompress` or `compress` before it is finished compiling it will throw an error indicating it isn't ready yet. To wait for the module to be loaded you can do something like the following:
 
 ```
 import decompress from 'wasm-lz4'

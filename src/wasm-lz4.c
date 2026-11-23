@@ -34,6 +34,31 @@ extern "C"
     return dstSize;
   }
 
+  static LZ4F_preferences_t makePreferences(int compressionLevel)
+  {
+    LZ4F_preferences_t preferences = LZ4F_INIT_PREFERENCES;
+    preferences.compressionLevel = compressionLevel;
+    return preferences;
+  }
+
+  size_t EMSCRIPTEN_KEEPALIVE compressFrameBound(size_t srcSize, int compressionLevel)
+  {
+    LZ4F_preferences_t preferences = makePreferences(compressionLevel);
+    return LZ4F_compressFrameBound(srcSize, &preferences);
+  }
+
+  int EMSCRIPTEN_KEEPALIVE compressFrame(
+      char *dstBuffer, size_t dstSize, const void *srcBuffer, size_t srcSize, int compressionLevel)
+  {
+    LZ4F_preferences_t preferences = makePreferences(compressionLevel);
+    size_t result = LZ4F_compressFrame(dstBuffer, dstSize, srcBuffer, srcSize, &preferences);
+    if (LZ4F_isError(result))
+    {
+      return -1;
+    }
+    return result;
+  }
+
   LZ4F_dctx *EMSCRIPTEN_KEEPALIVE createDecompressionContext()
   {
     LZ4F_decompressionContext_t ctx = NULL;
