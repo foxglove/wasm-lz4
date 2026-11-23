@@ -8,14 +8,15 @@ process.env.NODE_ENV = "test";
 
 const fs = require("fs");
 const assert = require("assert");
+const { describe, it } = require("node:test");
 const { open } = require("rosbag");
 
 const decompress = require("../");
 const compressed = fs.readFileSync(`${__dirname}/compressed.lz4`);
 const uncompressed = fs.readFileSync(`${__dirname}/uncompressed.txt`);
 
-// note: we cannot put this within a mocha test
-// because wasm compiles faster than mocha starts the first test
+// note: we cannot put this within a test
+// because wasm compiles faster than the runner starts the first test
 assert.throws(() => {
   decompress(compressed, uncompressed.byteLength);
 });
