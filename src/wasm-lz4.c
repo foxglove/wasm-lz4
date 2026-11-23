@@ -26,6 +26,9 @@ extern "C"
     int result = LZ4F_decompress(dctx, dstBuffer, dstSizePtr, srcBuffer, srcSizePtr, NULL);
     if (result != 0)
     {
+      // an error or a partially decoded frame leaves state in the context
+      // that would make the next, unrelated frame fail to decode
+      LZ4F_resetDecompressionContext(dctx);
       return -1;
     }
     return dstSize;
